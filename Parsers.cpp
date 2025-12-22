@@ -1,6 +1,8 @@
 #include "Parsers.hpp"
 #include <ctime>
 #include <chrono>
+#include <bitset>
+#include <iostream>
 #include <re2/re2.h>
 
 std::vector<std::unique_ptr<LineParser>> makeParsers() {
@@ -11,6 +13,26 @@ std::vector<std::unique_ptr<LineParser>> makeParsers() {
     parsers.emplace_back(std::make_unique<AnePowerParser>());
     parsers.emplace_back(std::make_unique<CombinedPowerParser>());
     return parsers;
+}
+
+ParserType TimeStampParser::type() const {
+    return ParserType::Timestamp;
+}
+
+ParserType CpuPowerParser::type() const {
+    return ParserType::CpuPower;
+}
+
+ParserType GpuPowerParser::type() const {
+    return ParserType::GpuPower;
+}
+
+ParserType AnePowerParser::type() const {
+    return ParserType::AnePower;
+}
+
+ParserType CombinedPowerParser::type() const {
+    return ParserType::CombinedPower;
 }
 
 bool TimeStampParser::parse(const std::string& line, MetricsSample& sample) const {
@@ -82,10 +104,15 @@ ParseTask::ParseTask(std::vector<MetricsSample>& d): parsers{makeParsers()}, dat
 
 void ParseTask::parse(std::vector<std::string>& task) {
     MetricsSample sample{};
+    std::bitset<static_cast<size_t>(ParserType::Count)> seen;
     for (const auto& line : task) {
         for (const auto& parser : parsers) {
-            parser->parse(line, sample);
+            if (parser->parse(line, sample)) {
+                seen.set(static_cast<size_t>(parser->type()));
+            }
         }
     }
-    data.push_back(sample);
+    if (seen.all()) {
+        data.push_back(sample);
+    }
 }

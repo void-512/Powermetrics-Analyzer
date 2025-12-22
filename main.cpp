@@ -23,16 +23,17 @@ void exportToCsv(const std::vector<MetricsSample>& parsedData,
     file.close();
 }
 
-
 int main(int argc, char* argv[]) {
-    FileReader fileReader("singlesample.txt");
+    FileReader fileReader("sample.txt");
     std::vector<MetricsSample> parsedData;
     ParseTask parseTask(parsedData);
     fileReader.start();
     std::vector<std::string> task;
     while (fileReader.getTask(task)) {
         parseTask.parse(task);
-        std::cout << parsedData.back() << std::endl;
+        if (!parsedData.empty()){ 
+            std::cout << parsedData.back() << std::endl;
+        }
     }
     exportToCsv(parsedData, "output.csv");
     return 0;
