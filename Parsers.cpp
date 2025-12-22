@@ -1,4 +1,5 @@
 #include "Parsers.hpp"
+#include "ParserFactory.hpp"
 #include <ctime>
 #include <chrono>
 #include <re2/re2.h>    
@@ -59,11 +60,23 @@ bool AnePowerParser::parse(const std::string& line, MetricsSample& sample) const
 }
 
 bool CombinedPowerParser::parse(const std::string& line, MetricsSample& sample) const {
-    static const RE2 re(R"(Combined Power (CPU + GPU + ANE):\s+(\d+)\s+mW)");
+    static const RE2 re(R"(Combined Power \(CPU \+ GPU \+ ANE\):\s+(\d+)\s+mW)");
     int value = 0;
     if (RE2::PartialMatch(line, re, &value)) {
         sample.setCombinedPowerMw(value);
         return true;
     }
     return false;
+}
+
+ParseTask::ParseTask(std::vector<MetricsSample>& d): parsers{makeParsers()}, data{d} {}
+
+void ParseTask::parse(std::vector<std::string>& task) {
+    MetricsSample sample{};
+    for (const auto& line : task) {
+        for (const auto& parser : parsers) {
+            parser->parse(line, sample);
+        }
+    }
+    data.push_back(sample);
 }
