@@ -2,6 +2,8 @@
 #define __PARSERS_HPP__
 #include "Sample.hpp"
 #include <string>
+#include <vector>
+#include <memory>
 
 class LineParser {
 public:
@@ -33,5 +35,15 @@ class CombinedPowerParser final : public LineParser {
 public:
     bool parse(const std::string& line, MetricsSample& sample) const override;
 };
+
+class ParseTask {
+    std::vector<std::unique_ptr<LineParser>> parsers;
+    std::vector<MetricsSample>& data;
+public:
+    ParseTask(std::vector<MetricsSample>& d);
+    void parse(std::vector<std::string>& task);
+};
+
+std::vector<std::unique_ptr<LineParser>> makeParsers();
 
 #endif
