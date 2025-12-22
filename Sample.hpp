@@ -1,12 +1,30 @@
-#pragma once
+#ifndef __SAMPLE_HPP__
+#define __SAMPLE_HPP__
 #include <chrono>
-#include <optional>
+#include <ostream>
 
-struct MetricsSample {
+class MetricsSample {
     std::chrono::system_clock::time_point timestamp;
 
     int cpu_power_mw;
     int gpu_power_mw;
     int ane_power_mw;
     int combined_power_mw;
+public:
+    MetricsSample();
+    std::chrono::system_clock::time_point getTimestamp() const;
+    int getCpuPowerMw() const;
+    int getGpuPowerMw() const;
+    int getAnePowerMw() const;
+    int getCombinedPowerMw() const;
+
+    std::chrono::system_clock::time_point setTimestamp() const;
+    int setCpuPowerMw() const;
+    int setGpuPowerMw() const;
+    int setAnePowerMw() const;
+    int setCombinedPowerMw() const;
+    friend std::ostream& operator<<(std::ostream& os, const MetricsSample& sample);
 };
+
+std::ostream& operator<<(std::ostream& os, const MetricsSample& sample);
+#endif

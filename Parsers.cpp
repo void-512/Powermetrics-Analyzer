@@ -1,4 +1,4 @@
-#include "parsers.hpp"
+#include "Parsers.hpp"
 #include <ctime>
 #include <chrono>
 #include <re2/re2.h>    
@@ -24,7 +24,7 @@ bool TimeStampParser::parse(const std::string& line, MetricsSample& sample) cons
     if (t == static_cast<time_t>(-1))
         return false;
 
-    sample.timestamp = std::chrono::system_clock::from_time_t(t);
+    sample.setTimestamp(std::chrono::system_clock::from_time_t(t));
     return true;
 }
 
@@ -32,7 +32,7 @@ bool CpuPowerParser::parse(const std::string& line, MetricsSample& sample) const
     static const RE2 re(R"(CPU Power:\s+(\d+)\s+mW)");
     int value = 0;
     if (RE2::PartialMatch(line, re, &value)) {
-        sample.cpu_power_mw = value;
+        sample.setCpuPowerMw(value);
         return true;
     }
     return false;
@@ -42,7 +42,7 @@ bool GpuPowerParser::parse(const std::string& line, MetricsSample& sample) const
     static const RE2 re(R"(GPU Power:\s+(\d+)\s+mW)");
     int value = 0;
     if (RE2::PartialMatch(line, re, &value)) {
-        sample.gpu_power_mw = value;
+        sample.setGpuPowerMw(value);
         return true;
     }
     return false;
@@ -52,7 +52,7 @@ bool AnePowerParser::parse(const std::string& line, MetricsSample& sample) const
     static const RE2 re(R"(ANE Power:\s+(\d+)\s+mW)");
     int value = 0;
     if (RE2::PartialMatch(line, re, &value)) {
-        sample.ane_power_mw = value;
+        sample.setAnePowerMw(value);
         return true;
     }
     return false;
@@ -62,7 +62,7 @@ bool CombinedPowerParser::parse(const std::string& line, MetricsSample& sample) 
     static const RE2 re(R"(Combined Power (CPU + GPU + ANE):\s+(\d+)\s+mW)");
     int value = 0;
     if (RE2::PartialMatch(line, re, &value)) {
-        sample.combined_power_mw = value;
+        sample.setCombinedPowerMw(value);
         return true;
     }
     return false;

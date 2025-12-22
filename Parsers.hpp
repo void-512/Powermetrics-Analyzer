@@ -1,5 +1,6 @@
-#pragma once
-#include "sample.hpp"
+#ifndef __PARSERS_HPP__
+#define __PARSERS_HPP__
+#include "Sample.hpp"
 #include <string>
 
 class LineParser {
@@ -32,3 +33,5 @@ class CombinedPowerParser final : public LineParser {
 public:
     bool parse(const std::string& line, MetricsSample& sample) const override;
 };
+
+#endif
