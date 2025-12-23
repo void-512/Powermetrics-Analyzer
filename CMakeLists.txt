@@ -4,6 +4,7 @@ project(PowermetricsTool LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(CMAKE_INSTALL_PREFIX .)
 set(ABSL_USE_GOOGLETEST OFF)
 set(ABSL_ENABLE_INSTALL ON)
 add_subdirectory(deps/abseil-cpp absl-build)
