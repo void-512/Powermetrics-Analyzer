@@ -2,7 +2,8 @@
 #include <ctime>
 #include <chrono>
 #include <bitset>
-#include <iostream>
+#include <sstream>
+#include <iomanip>
 #include <re2/re2.h>
 
 std::vector<std::unique_ptr<LineParser>> makeParsers() {
@@ -59,21 +60,21 @@ bool TimeStampParser::parse(const std::string& line, MetricsSample& sample) cons
     if (line.rfind("*** Sampled system activity", 0) != 0)
         return false;
 
-    static const RE2 re(
-        R"(Sampled system activity \(([^)]+)\))");
+    static const RE2 re(R"(Sampled system activity \(([^)]+)\))");
 
     std::string ts;
     if (!RE2::PartialMatch(line, re, &ts))
         return false;
 
     std::tm tm{};
-    constexpr const char* format = "%a %b %d %H:%M:%S %Y %z";
-
-    if (!strptime(ts.c_str(), format, &tm))
+    constexpr const char* format = "%a %b %d %H:%M:%S %Y";
+    std::istringstream ss(ts);
+    ss >> std::get_time(&tm, format);
+    if (ss.fail())
         return false;
 
-    time_t t = mktime(&tm);
-    if (t == static_cast<time_t>(-1))
+    std::time_t t = std::mktime(&tm);
+    if (t == static_cast<std::time_t>(-1))
         return false;
 
     sample.setTimestamp(std::chrono::system_clock::from_time_t(t));
