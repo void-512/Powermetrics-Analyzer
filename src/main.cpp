@@ -42,7 +42,11 @@ void exportToCsv(const std::vector<MetricsSample>& parsedData,
 
 
 int main(int argc, char* argv[]) {
-    FileReader fileReader("sample.txt");
+    if (argc < 2) {
+        std::cerr << "Usage: " << argv[0] << " <input_file>" << std::endl;
+        return 1;
+    } 
+    FileReader fileReader(argv[1]);
     std::vector<MetricsSample> parsedData;
     ParseTask parseTask(parsedData);
     fileReader.start();
