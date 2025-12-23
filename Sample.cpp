@@ -87,21 +87,19 @@ void MetricsSample::setGPUActiveResidence(double residence) {
 }
 
 std::ostream& operator<<(std::ostream& os, const MetricsSample& sample) {
-    os << "Timestamp: " << std::chrono::system_clock::to_time_t(sample.timestamp)
-       << ", CPU Power: " << sample.getCpuPowerMw() << " mW"
-       << ", GPU Power: " << sample.getGpuPowerMw() << " mW"
-       << ", ANE Power: " << sample.getAnePowerMw() << " mW"
-       << ", Combined Power: " << sample.getCombinedPowerMw() << " mW"
-       << ", CPU Frequencies: {";
-    for (const auto& [core, freq] : sample.cpu_frequency) {
-        os << "Core " << core << ": " << freq << " MHz, ";
+    const int cpuCount = sample.getCPUCount();
+    os << std::chrono::system_clock::to_time_t(sample.getTimestamp()) << ","
+        << sample.getCpuPowerMw() << ","
+        << sample.getGpuPowerMw() << ","
+        << sample.getAnePowerMw() << ","
+        << sample.getCombinedPowerMw() << ","
+        << sample.getGPUFrequency() << ","
+        << sample.getGPUActiveResidence();
+
+    for (int core = 0; core < cpuCount; core++) {
+        os << "," << sample.getCpuFrequency(core)
+            << "," << sample.getCpuActiveResidence(core);
     }
-    os << "}, CPU Active Residences: {";
-    for (const auto& [core, residence] : sample.cpu_active_residence) {
-        os << "Core " << core << ": " << residence << " %, ";
-    }
-    os << "}"
-    << ", GPU Frequency: " << sample.getGPUFrequency() << " MHz"
-    << ", GPU Active Residence: " << sample.getGPUActiveResidence() << " %";
+    os << "\n";
     return os;
 }
