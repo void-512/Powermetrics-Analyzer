@@ -1,24 +1,25 @@
 cmake_minimum_required(VERSION 3.20)
-project(powermetricsTool LANGUAGES CXX)
+project(PowermetricsTool LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(ABSL_USE_GOOGLETEST OFF CACHE BOOL "" FORCE)
-set(ABSL_ENABLE_INSTALL ON CACHE BOOL "" FORCE)
-add_subdirectory(deps-src/abseil-cpp absl-build)
+set(ABSL_USE_GOOGLETEST OFF)
+set(ABSL_ENABLE_INSTALL ON)
+add_subdirectory(deps/abseil-cpp absl-build)
 
-set(RE2_BUILD_TESTING OFF CACHE BOOL "" FORCE)
-add_subdirectory(deps-src/re2 re2-build)
+set(RE2_BUILD_TESTING OFF)
+add_subdirectory(deps/re2 re2-build)
 
-file(GLOB SRCS CONFIGURE_DEPENDS *.cpp *.hpp)
+file(GLOB_RECURSE SRCS CONFIGURE_DEPENDS src/*.cpp)
+file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS include/*.hpp)
 
-add_executable(app ${SRCS})
+add_executable(app ${SRCS} ${HEADERS})
 
 target_include_directories(app PRIVATE
-    ${PROJECT_SOURCE_DIR}
-    deps-src/abseil-cpp
-    deps-src/re2
+    include
+    deps/abseil-cpp
+    deps/re2
 )
 
 target_link_libraries(app PRIVATE re2)
