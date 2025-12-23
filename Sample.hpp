@@ -13,6 +13,8 @@ class MetricsSample {
     int combined_power_mw;
     std::unordered_map<int, int> cpu_frequency;
     std::unordered_map<int, double> cpu_active_residence;
+    int gpu_frequency;
+    double gpu_active_residence;
 public:
     MetricsSample();
     int getCPUCount() const;
@@ -24,6 +26,8 @@ public:
     int getCombinedPowerMw() const;
     int getCpuFrequency(int core) const;
     double getCpuActiveResidence(int core) const;
+    int getGPUFrequency() const;
+    int getGPUActiveResidence() const;
 
     void setTimestamp(const std::chrono::system_clock::time_point& ts);
     void setCpuPowerMw(int power);
@@ -32,6 +36,8 @@ public:
     void setCombinedPowerMw(int power);
     void setCpuFrequency(int core, int frequency);
     void setCpuActiveResidence(int core, double residence);
+    void setGPUFrequency(int frequency);
+    void setGPUActiveResidence(double residence);
 
     friend std::ostream& operator<<(std::ostream& os, const MetricsSample& sample);
 };

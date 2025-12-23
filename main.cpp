@@ -22,9 +22,11 @@ void exportToCsv(const std::vector<MetricsSample>& parsedData,
          << "CPU Power (mW),"
          << "GPU Power (mW),"
          << "ANE Power (mW),"
-         << "Combined Power (mW)";
+         << "Combined Power (mW),"
+         << "GPU Frequency (MHz),"
+         << "GPU Active (%)";
 
-    for (int core = 0; core < cpuCount; ++core) {
+    for (int core = 0; core < cpuCount; core++) {
         file << ",CPU" << core << " Frequency (MHz)"
              << ",CPU" << core << " Active (%)";
     }
@@ -36,9 +38,11 @@ void exportToCsv(const std::vector<MetricsSample>& parsedData,
              << sample.getCpuPowerMw() << ","
              << sample.getGpuPowerMw() << ","
              << sample.getAnePowerMw() << ","
-             << sample.getCombinedPowerMw();
+             << sample.getCombinedPowerMw() << ","
+             << sample.getGPUFrequency() << ","
+             << sample.getGPUActiveResidence();
 
-        for (int core = 0; core < cpuCount; ++core) {
+        for (int core = 0; core < cpuCount; core++) {
             file << "," << sample.getCpuFrequency(core)
                  << "," << sample.getCpuActiveResidence(core);
         }

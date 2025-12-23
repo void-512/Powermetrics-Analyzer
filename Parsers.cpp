@@ -14,6 +14,8 @@ std::vector<std::unique_ptr<LineParser>> makeParsers() {
     parsers.emplace_back(std::make_unique<CombinedPowerParser>());
     parsers.emplace_back(std::make_unique<CPUFrequencyParser>());
     parsers.emplace_back(std::make_unique<CPUActiveResidenceParser>());
+    parsers.emplace_back(std::make_unique<GPUFrequencyParser>());
+    parsers.emplace_back(std::make_unique<GPUActiveResidenceParser>());
     return parsers;
 }
 
@@ -43,6 +45,14 @@ ParserType CPUFrequencyParser::type() const {
 
 ParserType CPUActiveResidenceParser::type() const {
     return ParserType::CPUActiveResidence;
+}
+
+ParserType GPUFrequencyParser::type() const {
+    return ParserType::GPUFrequency;
+}
+
+ParserType GPUActiveResidenceParser::type() const {
+    return ParserType::GPUActiveResidence;
 }
 
 bool TimeStampParser::parse(const std::string& line, MetricsSample& sample) const {
@@ -111,9 +121,7 @@ bool CombinedPowerParser::parse(const std::string& line, MetricsSample& sample) 
 }
 
 bool CPUFrequencyParser::parse(const std::string& line, MetricsSample& sample) const {
-        static const RE2 re(
-            R"(CPU\s+(\d+)\s+frequency:\s+(\d+)\s+MHz)"
-        );
+        static const RE2 re(R"(CPU\s+(\d+)\s+frequency:\s+(\d+)\s+MHz)");
 
         int cpu = 0;
         int freq = 0;
@@ -126,15 +134,37 @@ bool CPUFrequencyParser::parse(const std::string& line, MetricsSample& sample) c
     }
 
 bool CPUActiveResidenceParser::parse(const std::string& line, MetricsSample& sample) const {
-    static const RE2 re(
-        R"(CPU\s+(\d+)\s+active\sresidency:\s*([\d.]+)%)"
-    );
+    static const RE2 re(R"(CPU\s+(\d+)\s+active\sresidency:\s*([\d.]+)%)");
 
     int cpu = 0;
     double util = 0.0;
 
     if (RE2::PartialMatch(line, re, &cpu, &util)) {
         sample.setCpuActiveResidence(cpu, util);
+        return true;
+    }
+    return false;
+}
+
+bool GPUFrequencyParser::parse(const std::string& line, MetricsSample& sample) const {
+    static const RE2 re(R"(GPU HW active frequency:\s+(\d+)\s+MHz)");
+
+    int freq = 0;
+
+    if (RE2::PartialMatch(line, re, &freq)) {
+        sample.setGPUFrequency(freq);
+        return true;
+    }
+    return false;
+}
+
+bool GPUActiveResidenceParser::parse(const std::string& line, MetricsSample& sample) const {
+    static const RE2 re(R"(GPU HW active residency:\s+([\d.]+)%)");
+
+    double util = 0.0;
+
+    if (RE2::PartialMatch(line, re, &util)) {
+        sample.setGPUActiveResidence(util);
         return true;
     }
     return false;

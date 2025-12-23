@@ -42,6 +42,14 @@ double MetricsSample::getCpuActiveResidence(int core) const {
     return 0.0;
 }
 
+int MetricsSample::getGPUFrequency() const {
+    return gpu_frequency;
+}
+
+int MetricsSample::getGPUActiveResidence() const {
+    return gpu_active_residence;
+}
+
 void MetricsSample::setTimestamp(const std::chrono::system_clock::time_point& ts) {
     timestamp = ts;
 }
@@ -70,6 +78,14 @@ void MetricsSample::setCpuActiveResidence(int core, double residence) {
     cpu_active_residence[core] = residence;
 }
 
+void MetricsSample::setGPUFrequency(int frequency) {
+    gpu_frequency = frequency;
+}
+
+void MetricsSample::setGPUActiveResidence(double residence) {
+    gpu_active_residence = residence;
+}
+
 std::ostream& operator<<(std::ostream& os, const MetricsSample& sample) {
     os << "Timestamp: " << std::chrono::system_clock::to_time_t(sample.timestamp)
        << ", CPU Power: " << sample.getCpuPowerMw() << " mW"
@@ -84,6 +100,8 @@ std::ostream& operator<<(std::ostream& os, const MetricsSample& sample) {
     for (const auto& [core, residence] : sample.cpu_active_residence) {
         os << "Core " << core << ": " << residence << " %, ";
     }
-    os << "}";
+    os << "}"
+    << ", GPU Frequency: " << sample.getGPUFrequency() << " MHz"
+    << ", GPU Active Residence: " << sample.getGPUActiveResidence() << " %";
     return os;
 }
